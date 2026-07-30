@@ -40,13 +40,13 @@ export function PromptComposer({
   };
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 px-4 pb-4 sm:px-6 sm:pb-6">
+    <div className="fixed inset-x-0 bottom-0 z-40 px-4 pb-4">
       {/* The bar is centred; the suggestions sit left-aligned above it, so
           they read as a hint attached to the workspace rather than a second
           centred element competing with the input. */}
       <div className="mx-auto flex max-w-2xl flex-col gap-2">
         {showSuggestions && (
-          <div className="flex w-full flex-wrap justify-start gap-2">
+          <div className="flex w-full flex-wrap justify-start gap-1 md:gap-2">
             {SUGGESTIONS.map((suggestion) => (
               <button
                 key={suggestion}

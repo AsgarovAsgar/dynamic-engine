@@ -15,9 +15,9 @@ export default function App() {
   const [failing, setFailing] = useState(false);
 
   return (
-    <div className="min-h-svh bg-canvas">
-      <header className="border-b border-border">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
+    <div className="max-h-min h-screen overflow-hidden overscroll-contain bg-canvas">
+      <header className="border-b border-border sticky top-0 bg-canvas">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
           <h1 className="text-lg font-semibold tracking-tight text-content">
             Dynamic Engine
           </h1>
@@ -54,7 +54,7 @@ export default function App() {
         pb-40 reserves room for the fixed composer, so the last widget can
         always scroll clear of it rather than sitting underneath.
       */}
-      <main className="mx-auto max-w-7xl px-4 pt-6 pb-40 sm:px-6">
+      <main className="mx-auto h-screen flex-1 overflow-auto max-w-6xl px-4 pt-6 pb-50 md:pb-44 sm:px-6">
         {dashboard.status === 'error' && (
           <div
             role="alert"
