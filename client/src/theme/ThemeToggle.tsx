@@ -23,7 +23,7 @@ export function ThemeToggle() {
     <div
       role="radiogroup"
       aria-label="Colour theme"
-      className="inline-flex items-center gap-1 rounded-control border border-border bg-elevated p-1"
+      className="inline-flex items-center gap-0.5 rounded-control border border-border bg-elevated p-0.5"
     >
       {THEMES.map(({ value, label }) => {
         const Icon = ICONS[value];
@@ -48,14 +48,14 @@ export function ThemeToggle() {
               if (next) setTheme(next.value);
             }}
             className={cn(
-              'grid size-8 place-items-center rounded-[0.375rem]',
+              'grid size-6 place-items-center rounded-[0.3125rem]',
               'transition-colors duration-(--duration-fast) ease-(--ease-out-soft)',
               isActive
                 ? 'bg-accent text-on-accent'
                 : 'text-content-muted hover:bg-overlay hover:text-content',
             )}
           >
-            <Icon className="size-4" aria-hidden="true" />
+            <Icon className="size-3.5" aria-hidden="true" />
           </button>
         );
       })}

@@ -15,6 +15,8 @@ interface Toast {
   id: number;
   tone: ToastTone;
   message: string;
+  /** Set while the exit animation plays, before the toast is removed. */
+  leaving?: boolean;
 }
 
 interface ToasterContextValue {
@@ -25,13 +27,26 @@ const ToasterContext = createContext<ToasterContextValue | null>(null);
 
 const DISMISS_AFTER_MS = 5000;
 
+/** Must match the exit animation's duration in index.css. */
+const EXIT_MS = 180;
+
 let nextId = 0;
 
 export function ToasterProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
+  /**
+   * Two-phase removal: flag the toast as leaving so its exit animation can
+   * play, then drop it once the animation has finished. Removing it outright
+   * would make it vanish mid-frame.
+   */
   const dismiss = useCallback((id: number) => {
-    setToasts((current) => current.filter((toast) => toast.id !== id));
+    setToasts((current) =>
+      current.map((toast) => (toast.id === id ? { ...toast, leaving: true } : toast)),
+    );
+    window.setTimeout(() => {
+      setToasts((current) => current.filter((toast) => toast.id !== id));
+    }, EXIT_MS);
   }, []);
 
   const notify = useCallback(
@@ -57,7 +72,7 @@ export function ToasterProvider({ children }: { children: ReactNode }) {
       <div
         aria-live="polite"
         aria-atomic="false"
-        className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex flex-col items-center gap-2 p-4 sm:items-end"
+        className="pointer-events-none fixed inset-x-0 top-4 z-50 flex flex-col items-center gap-2 px-4"
       >
         {toasts.map((toast) => (
           <ToastCard key={toast.id} toast={toast} onDismiss={() => dismiss(toast.id)} />
@@ -74,10 +89,12 @@ function ToastCard({ toast, onDismiss }: { toast: Toast; onDismiss: () => void }
     <div
       className={cn(
         'pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-widget border p-3',
-        'bg-overlay shadow-lg',
-        // Opacity + translate only: both are compositor properties, so an
+        'bg-overlay/95 shadow-lg backdrop-blur-sm',
+        // Opacity, translate and scale only — all compositor properties, so an
         // arriving toast cannot cost the dashboard a layout pass.
-        'motion-safe:animate-[toast-in_220ms_cubic-bezier(0.22,1,0.36,1)]',
+        toast.leaving
+          ? 'motion-safe:animate-[toast-out_180ms_cubic-bezier(0.4,0,1,1)_forwards]'
+          : 'motion-safe:animate-[toast-in_260ms_cubic-bezier(0.22,1,0.36,1)]',
         toast.tone === 'success' ? 'border-success/40' : 'border-danger/40',
       )}
     >

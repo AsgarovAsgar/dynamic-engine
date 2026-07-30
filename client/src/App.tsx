@@ -1,23 +1,38 @@
 import { useState } from 'react';
 import { AlertCircle, PlugZap } from 'lucide-react';
 import { DashboardGrid } from '@/components/DashboardGrid';
+import { DashboardLede, DashboardLedeSkeleton } from '@/components/DashboardLede';
 import { PromptComposer } from '@/components/PromptComposer';
 import { toRenderList, useDashboardStream } from '@/hooks/useDashboardStream';
 import { cn } from '@/lib/cn';
 import { setForceFailure } from '@/lib/failureMode';
+import { validateWidget } from '@/registry/validate';
 import { WidgetRenderer } from '@/registry/WidgetRenderer';
 import { ThemeToggle } from '@/theme/ThemeToggle';
 
 export default function App() {
   const dashboard = useDashboardStream();
   const isStreaming = dashboard.status === 'streaming';
-  const items = toRenderList(dashboard);
   const [failing, setFailing] = useState(false);
 
+  // The narrative answer is the page's lede, not a widget: it renders as plain
+  // content above the grid rather than inside a bordered card.
+  const allItems = toRenderList(dashboard);
+  const headline = allItems.find(({ slot }) => slot.type === 'NARRATIVE_HEADLINE');
+  const items = allItems.filter(({ slot }) => slot.type !== 'NARRATIVE_HEADLINE');
+
+  // Validated the same way the registry validates widgets — the payload
+  // arrives from the stream untrusted either way.
+  const ledeResult = headline?.payload ? validateWidget(headline.payload) : null;
+  const ledeData =
+    ledeResult?.valid && ledeResult.widget.type === 'NARRATIVE_HEADLINE'
+      ? ledeResult.widget.data
+      : null;
+
   return (
-    <div className="min-h-svh bg-canvas">
-      <header className="border-b border-border">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
+    <div className="max-h-min h-screen overflow-hidden overscroll-contain bg-canvas">
+      <header className="border-b border-border sticky top-0 bg-canvas">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
           <h1 className="text-lg font-semibold tracking-tight text-content">
             Dynamic Engine
           </h1>
@@ -34,7 +49,7 @@ export default function App() {
                 setForceFailure(next);
               }}
               className={cn(
-                'inline-flex items-center gap-1.5 rounded-control border px-2.5 py-1.5 text-xs font-medium',
+                'inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-control border px-2.5 py-1.5 text-xs font-medium',
                 'transition-colors duration-(--duration-fast) ease-(--ease-out-soft)',
                 failing
                   ? 'border-danger/40 bg-danger/10 text-danger'
@@ -50,23 +65,15 @@ export default function App() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
-        <PromptComposer onSubmit={dashboard.generate} isStreaming={isStreaming} />
-
-        {dashboard.meta && (
-          <p className="mt-6 text-sm text-content-muted">
-            <span className="text-content">{dashboard.meta.prompt}</span>
-            {' · '}
-            {Math.round(dashboard.meta.confidence * 100)}% confidence
-            {' · '}
-            {dashboard.meta.sources.length} sources
-          </p>
-        )}
-
+      {/*
+        pb-40 reserves room for the fixed composer, so the last widget can
+        always scroll clear of it rather than sitting underneath.
+      */}
+      <main className="mx-auto max-h-screen flex-1 overflow-auto max-w-6xl px-4 pt-6 pb-50 md:pb-44 sm:px-6">
         {dashboard.status === 'error' && (
           <div
             role="alert"
-            className="mt-6 flex items-start gap-2 rounded-widget border border-border bg-surface p-4"
+            className="flex items-start gap-2 rounded-widget border border-border bg-surface p-4"
           >
             <AlertCircle className="mt-0.5 size-4 shrink-0 text-danger" aria-hidden="true" />
             <div>
@@ -78,8 +85,16 @@ export default function App() {
           </div>
         )}
 
+        {ledeData && <DashboardLede data={ledeData} />}
+
+        {/* The slot is known from the meta frame before its payload arrives;
+            reserving the space keeps the grid below from jumping. A payload
+            that fails validation renders nothing rather than a skeleton that
+            would never resolve. */}
+        {headline && !headline.payload && <DashboardLedeSkeleton />}
+
         {items.length > 0 && (
-          <DashboardGrid layout={dashboard.layout} className="mt-6">
+          <DashboardGrid layout={dashboard.layout}>
             {items.map(({ slot, payload }) => (
               <WidgetRenderer
                 key={slot.id}
@@ -92,9 +107,15 @@ export default function App() {
         )}
 
         {dashboard.status === 'idle' && (
-          <p className="mt-16 text-center text-sm text-content-subtle">
-            Ask a question to generate a dashboard.
-          </p>
+          <div className="flex min-h-[50svh] flex-col items-center justify-center text-center">
+            <h2 className="text-xl font-medium text-content">
+              What would you like to know?
+            </h2>
+            <p className="mt-2 max-w-md text-sm text-content-muted">
+              Ask a question and the workspace assembles itself from the
+              answer.
+            </p>
+          </div>
         )}
 
         {/* Announces stream progress to screen readers without stealing focus. */}
@@ -106,6 +127,8 @@ export default function App() {
               : ''}
         </p>
       </main>
+
+      <PromptComposer onSubmit={dashboard.generate} isStreaming={isStreaming} />
     </div>
   );
 }
