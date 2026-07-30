@@ -12,12 +12,6 @@ const CHIP: Record<WidgetStatus, string> = {
 };
 
 /**
- * The generated answer, rendered as page content rather than as a widget.
- *
- * It reads as the lede — the thing the user asked for — so it gets no card,
- * border, or fill. Everything below it is supporting detail.
- */
-/**
  * Placeholder matching the lede's rendered proportions, so the grid below does
  * not jump when the headline frame arrives. Heights mirror the real elements:
  * a headline line, a subline, and a row of chips.
@@ -36,6 +30,12 @@ export function DashboardLedeSkeleton() {
   );
 }
 
+/**
+ * The generated answer, rendered as page content rather than as a widget.
+ *
+ * It reads as the lede — the thing the user asked for — so it gets no card,
+ * border, or fill. Everything below it is supporting detail.
+ */
 export function DashboardLede({ data }: { data: NarrativeHeadlineData }) {
   const { headline, subline, chips } = data;
 
