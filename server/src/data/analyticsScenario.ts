@@ -80,7 +80,9 @@ export const analyticsWidgets: Widget[] = [
     id: 'wgt_regions_table',
     type: 'DATA_TABLE',
     title: 'Active user regions',
-    layout: { colSpan: 4, rowSpan: 2, order: 5, minHeight: 320 },
+    // Matches the risk table: the scroll body is a fixed five rows regardless
+    // of how many rows arrive, so both tables occupy the same height.
+    layout: { colSpan: 4, rowSpan: 2, order: 5, minHeight: 330 },
     data: {
       columns: [
         { key: 'region', label: 'Region', align: 'left', sortable: true, format: 'text', weight: 3 },

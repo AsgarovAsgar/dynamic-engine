@@ -1,5 +1,11 @@
 import { Skeleton } from '@/components/Skeleton';
 import type { WidgetType } from '@/types/widgets';
+import {
+  HEADER_HEIGHT,
+  ROW_HEIGHT,
+  SCROLL_BODY_HEIGHT,
+  VISIBLE_ROWS,
+} from '@/widgets/tableMetrics';
 
 /**
  * Per-archetype loading placeholders.
@@ -37,19 +43,28 @@ function DataTableSkeleton() {
         <Skeleton className="h-7 w-36 rounded-control" />
       </div>
 
-      <div className="min-h-0 flex-1 overflow-hidden px-5">
-        <div className="flex gap-4 border-b border-border py-2">
+
+      {/* Same fixed box the real scroll body occupies, so the swap does not
+          resize the card. */}
+      <div
+        style={{ height: SCROLL_BODY_HEIGHT }}
+        className="shrink-0 overflow-hidden px-5"
+      >
+        <div
+          className="flex items-center gap-4 border-b border-border"
+          style={{ height: HEADER_HEIGHT }}
+        >
           <Skeleton className="h-3 flex-3" />
           <Skeleton className="h-3 flex-2" />
           <Skeleton className="h-3 flex-1" />
           <Skeleton className="h-3 flex-2" />
         </div>
 
-        {Array.from({ length: 6 }, (_, i) => (
+        {Array.from({ length: VISIBLE_ROWS }, (_, i) => (
           <div
             key={i}
             className="flex shrink-0 items-center gap-4 border-b border-border/50"
-            style={{ height: 40 }}
+            style={{ height: ROW_HEIGHT }}
           >
             <Skeleton className="h-3.5 flex-3" />
             <Skeleton className="h-3.5 flex-2" />
@@ -60,7 +75,7 @@ function DataTableSkeleton() {
       </div>
 
       <div className="shrink-0 border-t border-border px-5 py-2">
-        <Skeleton className="h-3 w-32" />
+        <Skeleton className="h-3.5 w-32" />
       </div>
     </div>
   );

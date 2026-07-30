@@ -4,11 +4,9 @@ import { cn } from '@/lib/cn';
 import { compareCells, formatCell } from '@/lib/format';
 import type { WidgetComponentProps } from '@/registry/registry';
 import type { DataTableWidget, TableColumn } from '@/types/widgets';
+import { ROW_HEIGHT, SCROLL_BODY_HEIGHT } from './tableMetrics';
 
 type SortDirection = 'asc' | 'desc';
-
-/** Row height in px. Fixed, because virtualization needs to know it up front. */
-const ROW_HEIGHT = 40;
 
 /**
  * Below this, plain rendering wins: the DOM cost is trivial and virtualization
@@ -17,8 +15,12 @@ const ROW_HEIGHT = 40;
  */
 const VIRTUALIZE_THRESHOLD = 100;
 
-/** Extra rows rendered beyond the viewport, so fast scrolling doesn't flash gaps. */
-const OVERSCAN = 6;
+/**
+ * Extra rows rendered above and below the viewport, so fast scrolling does not
+ * flash gaps. Kept small relative to the visible window — a large overscan on a
+ * short viewport renders far more than it saves.
+ */
+const OVERSCAN = 3;
 
 const ALIGN: Record<NonNullable<TableColumn['align']>, string> = {
   left: 'text-left',
@@ -68,17 +70,22 @@ export function DataTable({ widget }: WidgetComponentProps<DataTableWidget>) {
 
   const shouldVirtualize = visibleRows.length > VIRTUALIZE_THRESHOLD;
 
-  const { offsetY, windowRows } = useMemo(() => {
+  const { offsetY, offsetBottom, windowRows } = useMemo(() => {
     if (!shouldVirtualize || viewportHeight === 0) {
-      return { offsetY: 0, windowRows: visibleRows };
+      return { offsetY: 0, offsetBottom: 0, windowRows: visibleRows };
     }
 
     const first = Math.max(0, Math.floor(scrollTop / ROW_HEIGHT) - OVERSCAN);
     const count = Math.ceil(viewportHeight / ROW_HEIGHT) + OVERSCAN * 2;
+    const last = Math.min(visibleRows.length, first + count);
 
     return {
       offsetY: first * ROW_HEIGHT,
-      windowRows: visibleRows.slice(first, first + count),
+      // Both spacers are required: without the trailing one the container is
+      // only as tall as the rendered window, so there is nowhere to scroll to
+      // and the scrollbar misrepresents the dataset.
+      offsetBottom: (visibleRows.length - last) * ROW_HEIGHT,
+      windowRows: visibleRows.slice(first, last),
     };
   }, [shouldVirtualize, viewportHeight, scrollTop, visibleRows]);
 
@@ -130,7 +137,14 @@ export function DataTable({ widget }: WidgetComponentProps<DataTableWidget>) {
           }
         }}
         onScroll={(event) => setScrollTop(event.currentTarget.scrollTop)}
-        className="min-h-0 flex-1 overflow-auto px-5 pb-5"
+        // Fixed height rather than flex-1: the body shows exactly VISIBLE_ROWS
+        // rows regardless of how tall the card is or what the surrounding
+        // chrome does. The sticky header sits inside this box, so its height
+        // is part of the total.
+        style={{ height: SCROLL_BODY_HEIGHT }}
+        // shrink-0 is required: a flex child shrinks below its specified height
+        // by default, which would collapse the body and show fewer rows.
+        className="shrink-0 overflow-auto px-5"
       >
         <table className="w-full border-collapse text-sm">
           <thead className="sticky top-0 z-10 bg-surface">
@@ -202,8 +216,13 @@ export function DataTable({ widget }: WidgetComponentProps<DataTableWidget>) {
                 {columns.map((column) => (
                   <td
                     key={column.key}
+                    // Height on the cell, not padding: `height` on a <tr> is
+                    // only a minimum that cell padding overrides, so padded
+                    // cells made rows 57px while the virtualization maths
+                    // assumed 40 — putting every window and spacer out.
+                    style={{ height: ROW_HEIGHT }}
                     className={cn(
-                      'border-b border-border/50 py-2 text-content',
+                      'truncate border-b border-border/50 py-0 text-content',
                       ALIGN[column.align],
                       (column.format === 'score' ||
                         column.format === 'number' ||
@@ -217,6 +236,12 @@ export function DataTable({ widget }: WidgetComponentProps<DataTableWidget>) {
                 ))}
               </tr>
             ))}
+
+            {offsetBottom > 0 && (
+              <tr aria-hidden="true">
+                <td colSpan={columns.length} style={{ height: offsetBottom, padding: 0 }} />
+              </tr>
+            )}
           </tbody>
         </table>
 

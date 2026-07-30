@@ -1,4 +1,5 @@
 import type { Widget } from '../types/widgets.js';
+import { generateAccounts } from './generateAccounts.js';
 
 /**
  * "High Risk Accounts Review" — the scenario from the assignment mockup.
@@ -75,7 +76,8 @@ export const riskWidgets: Widget[] = [
     id: 'wgt_accounts_table',
     type: 'DATA_TABLE',
     title: 'Top accounts by risk',
-    layout: { colSpan: 4, rowSpan: 2, order: 5, minHeight: 320 },
+    // Title row (~62) + five-row scroll body (235) + footer (~31).
+    layout: { colSpan: 4, rowSpan: 2, order: 5, minHeight: 330 },
     data: {
       columns: [
         { key: 'account', label: 'Account', align: 'left', sortable: true, format: 'text', weight: 3 },
@@ -94,6 +96,10 @@ export const riskWidgets: Widget[] = [
         { account: 'Pinnacle Health', exposure: 2_180_000, score: 0.66, region: 'North' },
         { account: 'Aurora Textiles', exposure: 1_940_000, score: 0.64, region: 'Midwest' },
         { account: 'Sable Chemicals', exposure: 1_720_000, score: 0.61, region: 'South-East' },
+        // The named accounts above come from the design mock; the rest is
+        // generated so the client's virtualization threshold is actually
+        // crossed and `totalRows` is not a claim about data that isn't sent.
+        ...generateAccounts(490, 0.61),
       ],
       totalRows: 2988,
       defaultSort: { key: 'score', direction: 'desc' },
