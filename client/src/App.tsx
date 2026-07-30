@@ -1,6 +1,6 @@
 import { ThemeToggle } from '@/theme/ThemeToggle';
 
-/** Replaced by the workspace shell once the widget registry lands. */
+/** Replaced by the workspace shell once the dashboard stream lands. */
 export default function App() {
   return (
     <div className="min-h-svh bg-canvas p-8">

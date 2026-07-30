@@ -107,6 +107,15 @@
   --color-skeleton-shine: #2e2e2e;
 }
 
+/* Skeleton shimmer. Transform-only, so it animates on the compositor and
+   never triggers layout — a paint-heavy placeholder would undermine the very
+   frame stability it exists to protect. */
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
 @layer base {
   html {
     background-color: var(--color-canvas);
