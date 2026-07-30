@@ -37,17 +37,24 @@ function WidgetRendererImpl({ payload, layout, slotType }: WidgetRendererProps) 
   const shell = cn(
     'overflow-hidden rounded-widget border border-border bg-surface',
     'transition-colors duration-(--duration-base) ease-(--ease-out-soft)',
+    // One column on phones; authored spans apply from md up.
+    'col-span-1 md:col-span-(--col-span)',
   );
 
   // height (not minHeight) pins the cell to exactly its reserved size in every
   // state. A floor alone lets a tall skeleton or a verbose error message grow
   // the row and shift the page — the precise failure this design prevents.
+  //
+  // colSpan goes through a custom property rather than a direct `gridColumn`:
+  // spans are authored for a 4-column desktop grid, and an inline style would
+  // beat any media query, forcing `span 4` onto a single-column phone layout.
+  // The stylesheet consumes `--col-span` only from `md` up.
   const style = {
-    gridColumn: `span ${layout.colSpan}`,
+    '--col-span': layout.colSpan,
     gridRow: `span ${layout.rowSpan}`,
     height: `${layout.minHeight}px`,
     order: layout.order,
-  } satisfies React.CSSProperties;
+  } as React.CSSProperties;
 
   // Payload not yet streamed in.
   if (payload === undefined) {
