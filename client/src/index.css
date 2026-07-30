@@ -37,6 +37,12 @@
   --color-skeleton: #1e1e24;
   --color-skeleton-shine: #2a2a32;
 
+  /* Control knobs and thumbs. Deliberately not --color-content (the body-text
+     token, which inverts per theme) nor --color-on-accent (near-black in dark,
+     since it is meant for text on an orange fill). A switch thumb reads as a
+     physical object and should stay light against every track colour. */
+  --color-knob: #ffffff;
+
   --radius-widget: 0.75rem;
   --radius-control: 0.5rem;
 
@@ -51,13 +57,19 @@
  * referencing them update with no component re-render and no class churn.
  */
 :root[data-theme='light'] {
-  --color-canvas: #fafafa;
+  --color-canvas: #f4f4f5;
   --color-surface: #ffffff;
-  --color-elevated: #f4f4f5;
-  --color-overlay: #ffffff;
+  /*
+   * In dark mode each step up the stack gets lighter; in light mode it has to
+   * get *darker*, or "elevated" and "overlay" both collapse into the white
+   * surface they sit on. Getting this backwards made off-state toggles and
+   * hover fills invisible against a white card.
+   */
+  --color-elevated: #f1f1f3;
+  --color-overlay: #e6e6ea;
 
-  --color-border: #e4e4e7;
-  --color-border-strong: #d4d4d8;
+  --color-border: #e0e0e4;
+  --color-border-strong: #c4c4ca;
 
   --color-content: #18181b;
   --color-content-muted: #52525b;
@@ -82,10 +94,16 @@
  * structure that subtle fills convey elsewhere.
  */
 :root[data-theme='high-contrast'] {
+  /*
+   * The stack separates by luminance as well as by border, so cards read as
+   * distinct objects rather than as outlines on a single black field. Every
+   * step stays dark enough to hold white text at AAA — surface against
+   * content is still better than 18:1.
+   */
   --color-canvas: #000000;
-  --color-surface: #000000;
-  --color-elevated: #0d0d0d;
-  --color-overlay: #000000;
+  --color-surface: #121212;
+  --color-elevated: #1c1c1c;
+  --color-overlay: #2a2a2a;
 
   --color-border: #ffffff;
   --color-border-strong: #ffffff;
@@ -103,8 +121,10 @@
   --color-warning: #ffd400;
   --color-danger: #ff5c5c;
 
-  --color-skeleton: #1a1a1a;
-  --color-skeleton-shine: #2e2e2e;
+  /* Lifted with the surfaces, so a loading placeholder still reads as
+     something sitting inside a card rather than a hole in it. */
+  --color-skeleton: #2a2a2a;
+  --color-skeleton-shine: #3d3d3d;
 }
 
 /* Skeleton shimmer. Transform-only, so it animates on the compositor and

@@ -183,15 +183,23 @@ function Field({
             onClick={() => onChange(!value)}
             onBlur={onBlur}
             className={cn(
-              'relative h-6 w-11 rounded-full transition-colors duration-(--duration-fast)',
+              'relative h-6 w-11 rounded-full',
+              'transition-colors duration-(--duration-fast)',
               value === true ? 'bg-accent' : 'bg-overlay',
             )}
           >
+            {/* Track 44×24, knob 16 — 4px inset all round, so 20px of travel.
+                The offset is inline rather than a translate-x utility: those
+                only set a CSS variable that needs a composing `transform`
+                utility to take effect, and silently did nothing here. Vertical
+                centring rides in the same transform. */}
             <span
+              style={{
+                transform: `translate(${value === true ? 20 : 0}px, -50%)`,
+              }}
               className={cn(
-                'absolute top-1 size-4 rounded-full bg-content',
+                'absolute top-1/2 left-1 size-4 rounded-full bg-knob shadow-sm',
                 'transition-transform duration-(--duration-fast) ease-(--ease-out-soft)',
-                value === true ? 'translate-x-6' : 'translate-x-1',
               )}
             />
           </button>

@@ -34,7 +34,7 @@ export default function App() {
                 setForceFailure(next);
               }}
               className={cn(
-                'inline-flex items-center gap-1.5 rounded-control border px-2.5 py-1.5 text-xs font-medium',
+                'inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-control border px-2.5 py-1.5 text-xs font-medium',
                 'transition-colors duration-(--duration-fast) ease-(--ease-out-soft)',
                 failing
                   ? 'border-danger/40 bg-danger/10 text-danger'
@@ -52,16 +52,6 @@ export default function App() {
 
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
         <PromptComposer onSubmit={dashboard.generate} isStreaming={isStreaming} />
-
-        {dashboard.meta && (
-          <p className="mt-6 text-sm text-content-muted">
-            <span className="text-content">{dashboard.meta.prompt}</span>
-            {' · '}
-            {Math.round(dashboard.meta.confidence * 100)}% confidence
-            {' · '}
-            {dashboard.meta.sources.length} sources
-          </p>
-        )}
 
         {dashboard.status === 'error' && (
           <div
