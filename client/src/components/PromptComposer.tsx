@@ -40,7 +40,7 @@ export function PromptComposer({
   };
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 px-4 pb-4">
+    <div className="fixed inset-x-0 bottom-0 z-40 px-4 pb-4 overscroll-none overflow-hidden">
       {/* The bar is centred; the suggestions sit left-aligned above it, so
           they read as a hint attached to the workspace rather than a second
           centred element competing with the input. */}

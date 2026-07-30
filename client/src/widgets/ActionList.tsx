@@ -66,7 +66,12 @@ export function ActionList({ widget }: WidgetComponentProps<ActionListWidget>) {
                       { id: item.id, label: item.label, done: isDone },
                     )
                   }
-                  className="peer sr-only"
+                  // Not `sr-only`: that positions the input absolutely at the
+                  // top of its container, so focusing it on click makes the
+                  // browser scroll the whole region up to reach it. Keeping
+                  // the input in flow and merely invisible fixes the jump
+                  // while staying focusable and announced.
+                  className="peer size-0 appearance-none opacity-0 outline-none"
                 />
 
                 <span
