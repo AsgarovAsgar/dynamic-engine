@@ -1,7 +1,10 @@
-import { AlertCircle } from 'lucide-react';
+import { useState } from 'react';
+import { AlertCircle, PlugZap } from 'lucide-react';
 import { DashboardGrid } from '@/components/DashboardGrid';
 import { PromptComposer } from '@/components/PromptComposer';
 import { toRenderList, useDashboardStream } from '@/hooks/useDashboardStream';
+import { cn } from '@/lib/cn';
+import { setForceFailure } from '@/lib/failureMode';
 import { WidgetRenderer } from '@/registry/WidgetRenderer';
 import { ThemeToggle } from '@/theme/ThemeToggle';
 
@@ -9,6 +12,7 @@ export default function App() {
   const dashboard = useDashboardStream();
   const isStreaming = dashboard.status === 'streaming';
   const items = toRenderList(dashboard);
+  const [failing, setFailing] = useState(false);
 
   return (
     <div className="min-h-svh bg-canvas">
@@ -17,7 +21,32 @@ export default function App() {
           <h1 className="text-lg font-semibold tracking-tight text-content">
             Dynamic Engine
           </h1>
-          <ThemeToggle />
+
+          <div className="flex items-center gap-2">
+            {/* Demo affordance: forces widget actions to fail so optimistic
+                rollback can be shown deliberately. */}
+            <button
+              type="button"
+              aria-pressed={failing}
+              onClick={() => {
+                const next = !failing;
+                setFailing(next);
+                setForceFailure(next);
+              }}
+              className={cn(
+                'inline-flex items-center gap-1.5 rounded-control border px-2.5 py-1.5 text-xs font-medium',
+                'transition-colors duration-(--duration-fast) ease-(--ease-out-soft)',
+                failing
+                  ? 'border-danger/40 bg-danger/10 text-danger'
+                  : 'border-border text-content-muted hover:text-content',
+              )}
+            >
+              <PlugZap className="size-3.5" aria-hidden="true" />
+              {failing ? 'Failing actions' : 'Simulate failure'}
+            </button>
+
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 

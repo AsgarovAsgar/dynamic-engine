@@ -116,6 +116,19 @@
   }
 }
 
+/* Toast entrance. Opacity and translate only — both composite, so a toast
+   arriving mid-stream cannot cost the dashboard a layout pass. */
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @layer base {
   html {
     background-color: var(--color-canvas);
