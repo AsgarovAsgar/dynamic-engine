@@ -1,0 +1,191 @@
+import type { Widget } from '../types/widgets.js';
+
+/**
+ * "High Risk Accounts Review" — the scenario from the assignment mockup.
+ * Widget order here is the order frames are streamed in.
+ */
+export const riskWidgets: Widget[] = [
+  {
+    id: 'wgt_headline',
+    type: 'NARRATIVE_HEADLINE',
+    title: 'Summary',
+    layout: { colSpan: 4, rowSpan: 1, order: 0, minHeight: 148 },
+    data: {
+      headline: '2,988 accounts are high-risk — 996 are critical.',
+      subline: 'Concentrated in the South-East; ABC Manufacturing tops the list at 0.93.',
+      chips: [
+        { label: 'High Confidence', icon: 'circle-check', status: 'success' },
+        { label: 'Sourced from customers_db · 4 tables', icon: 'database', status: 'neutral' },
+        { label: 'Audit-logged', icon: 'shield-check', status: 'neutral' },
+      ],
+    },
+  },
+  {
+    id: 'wgt_high_risk',
+    type: 'METRIC_CARD',
+    title: 'High Risk',
+    layout: { colSpan: 1, rowSpan: 1, order: 1, minHeight: 132 },
+    data: {
+      value: '2,988',
+      trend: '3.2%',
+      trendDirection: 'down',
+      status: 'danger',
+      sparkline: [42, 38, 45, 40, 36, 33, 31],
+    },
+  },
+  {
+    id: 'wgt_critical',
+    type: 'METRIC_CARD',
+    title: 'Critical',
+    layout: { colSpan: 1, rowSpan: 1, order: 2, minHeight: 132 },
+    data: {
+      value: '996',
+      trend: '1.1%',
+      trendDirection: 'down',
+      status: 'danger',
+      sparkline: [30, 32, 28, 31, 29, 27, 26],
+    },
+  },
+  {
+    id: 'wgt_avg_score',
+    type: 'METRIC_CARD',
+    title: 'Avg Risk Score',
+    layout: { colSpan: 1, rowSpan: 1, order: 3, minHeight: 132 },
+    data: {
+      value: '0.68',
+      status: 'warning',
+      caption: 'High-risk cohort',
+      sparkline: [0.61, 0.63, 0.62, 0.65, 0.66, 0.67, 0.68],
+    },
+  },
+  {
+    id: 'wgt_flagged',
+    type: 'METRIC_CARD',
+    title: 'Flagged Today',
+    layout: { colSpan: 1, rowSpan: 1, order: 4, minHeight: 132 },
+    data: {
+      value: '38',
+      trend: '10%',
+      trendDirection: 'down',
+      status: 'success',
+      sparkline: [55, 52, 48, 44, 42, 40, 38],
+    },
+  },
+  {
+    id: 'wgt_accounts_table',
+    type: 'DATA_TABLE',
+    title: 'Top accounts by risk',
+    layout: { colSpan: 4, rowSpan: 2, order: 5, minHeight: 320 },
+    data: {
+      columns: [
+        { key: 'account', label: 'Account', align: 'left', sortable: true, format: 'text', weight: 3 },
+        { key: 'exposure', label: 'Exposure', align: 'left', sortable: true, format: 'currency', weight: 2 },
+        { key: 'score', label: 'Score', align: 'right', sortable: true, format: 'score', weight: 1 },
+        { key: 'region', label: 'Region', align: 'right', sortable: true, format: 'text', weight: 2 },
+      ],
+      rows: [
+        { account: 'ABC Manufacturing', exposure: 5_100_000, score: 0.93, region: 'South-East' },
+        { account: 'Delta Logistics', exposure: 4_700_000, score: 0.89, region: 'West' },
+        { account: 'Orion Retail', exposure: 3_900_000, score: 0.81, region: 'Midwest' },
+        { account: 'Vega Foods', exposure: 3_400_000, score: 0.77, region: 'South-East' },
+        { account: 'Nimbus Tech', exposure: 2_900_000, score: 0.72, region: 'North' },
+        { account: 'Helios Energy', exposure: 2_650_000, score: 0.70, region: 'South-East' },
+        { account: 'Cobalt Freight', exposure: 2_410_000, score: 0.68, region: 'West' },
+        { account: 'Pinnacle Health', exposure: 2_180_000, score: 0.66, region: 'North' },
+        { account: 'Aurora Textiles', exposure: 1_940_000, score: 0.64, region: 'Midwest' },
+        { account: 'Sable Chemicals', exposure: 1_720_000, score: 0.61, region: 'South-East' },
+      ],
+      totalRows: 2988,
+      defaultSort: { key: 'score', direction: 'desc' },
+      virtualized: true,
+    },
+  },
+  {
+    id: 'wgt_actions',
+    type: 'ACTION_LIST',
+    title: 'Recommended actions',
+    layout: { colSpan: 2, rowSpan: 1, order: 6, minHeight: 236 },
+    data: {
+      items: [
+        { id: 'act_01', label: 'Review 996 critical accounts', completed: false, actionEndpoint: '/api/widget-action' },
+        { id: 'act_02', label: 'Freeze new credit for the top 5 segments', completed: false, actionEndpoint: '/api/widget-action' },
+        { id: 'act_03', label: 'Alert the risk team this week', completed: false, actionEndpoint: '/api/widget-action' },
+        { id: 'act_04', label: 'Schedule review with relationship managers', completed: false, actionEndpoint: '/api/widget-action' },
+      ],
+    },
+  },
+  {
+    id: 'wgt_distribution',
+    type: 'DISTRIBUTION_CHART',
+    title: 'Risk score distribution',
+    layout: { colSpan: 2, rowSpan: 1, order: 7, minHeight: 236 },
+    data: {
+      bins: [
+        { label: '0.0', value: 12 },
+        { label: '0.1', value: 28 },
+        { label: '0.2', value: 54 },
+        { label: '0.3', value: 96 },
+        { label: '0.4', value: 148 },
+        { label: '0.5', value: 212 },
+        { label: '0.6', value: 268 },
+        { label: '0.7', value: 246 },
+        { label: '0.8', value: 188 },
+        { label: '0.9', value: 118 },
+        { label: '1.0', value: 62 },
+      ],
+      xAxisLabel: 'Risk score',
+      yAxisLabel: 'Accounts',
+      highlightIndex: 6,
+    },
+  },
+  {
+    id: 'wgt_params',
+    type: 'DYNAMIC_FORM',
+    title: 'Risk model parameters',
+    layout: { colSpan: 2, rowSpan: 1, order: 8, minHeight: 260 },
+    data: {
+      submitLabel: 'Apply parameters',
+      actionEndpoint: '/api/widget-action',
+      fields: [
+        {
+          name: 'threshold',
+          label: 'Risk threshold',
+          type: 'slider',
+          description: 'Accounts scoring above this are flagged high-risk.',
+          defaultValue: 0.65,
+          min: 0,
+          max: 1,
+          step: 0.01,
+          validation: { required: true, min: 0, max: 1, message: 'Threshold must be between 0 and 1.' },
+        },
+        {
+          name: 'region',
+          label: 'Region filter',
+          type: 'select',
+          defaultValue: 'south-east',
+          options: [
+            { label: 'All regions', value: 'all' },
+            { label: 'South-East', value: 'south-east' },
+            { label: 'West', value: 'west' },
+            { label: 'Midwest', value: 'midwest' },
+            { label: 'North', value: 'north' },
+          ],
+          validation: { required: true },
+        },
+        {
+          name: 'notifyTeam',
+          label: 'Notify risk team on apply',
+          type: 'toggle',
+          defaultValue: true,
+        },
+        {
+          name: 'reviewNote',
+          label: 'Review note',
+          type: 'text',
+          defaultValue: '',
+          validation: { maxLength: 140, message: 'Keep the note under 140 characters.' },
+        },
+      ],
+    },
+  },
+];
