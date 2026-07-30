@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dynamic Engine</title>
+    <script>
+      // Applies the stored theme before first paint. Without this, React would
+      // set it after hydration and every reload would flash the default theme.
+      (function () {
+        try {
+          var stored = localStorage.getItem('dynamic-engine:theme');
+          if (stored === 'dark' || stored === 'light' || stored === 'high-contrast') {
+            document.documentElement.setAttribute('data-theme', stored);
+          }
+        } catch (e) {
+          /* localStorage unavailable; keep the default */
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
