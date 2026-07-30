@@ -50,13 +50,15 @@ export default function App() {
         </div>
       </header>
 
-      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
-        <PromptComposer onSubmit={dashboard.generate} isStreaming={isStreaming} />
-
+      {/*
+        pb-40 reserves room for the fixed composer, so the last widget can
+        always scroll clear of it rather than sitting underneath.
+      */}
+      <main className="mx-auto max-w-7xl px-4 pt-6 pb-40 sm:px-6">
         {dashboard.status === 'error' && (
           <div
             role="alert"
-            className="mt-6 flex items-start gap-2 rounded-widget border border-border bg-surface p-4"
+            className="flex items-start gap-2 rounded-widget border border-border bg-surface p-4"
           >
             <AlertCircle className="mt-0.5 size-4 shrink-0 text-danger" aria-hidden="true" />
             <div>
@@ -69,7 +71,7 @@ export default function App() {
         )}
 
         {items.length > 0 && (
-          <DashboardGrid layout={dashboard.layout} className="mt-6">
+          <DashboardGrid layout={dashboard.layout}>
             {items.map(({ slot, payload }) => (
               <WidgetRenderer
                 key={slot.id}
@@ -82,9 +84,15 @@ export default function App() {
         )}
 
         {dashboard.status === 'idle' && (
-          <p className="mt-16 text-center text-sm text-content-subtle">
-            Ask a question to generate a dashboard.
-          </p>
+          <div className="flex min-h-[50svh] flex-col items-center justify-center text-center">
+            <h2 className="text-xl font-medium text-content">
+              What would you like to know?
+            </h2>
+            <p className="mt-2 max-w-md text-sm text-content-muted">
+              Ask a question and the workspace assembles itself from the
+              answer.
+            </p>
+          </div>
         )}
 
         {/* Announces stream progress to screen readers without stealing focus. */}
@@ -96,6 +104,8 @@ export default function App() {
               : ''}
         </p>
       </main>
+
+      <PromptComposer onSubmit={dashboard.generate} isStreaming={isStreaming} />
     </div>
   );
 }

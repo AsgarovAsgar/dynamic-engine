@@ -57,7 +57,8 @@ export function ToasterProvider({ children }: { children: ReactNode }) {
       <div
         aria-live="polite"
         aria-atomic="false"
-        className="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex flex-col items-center gap-2 p-4 sm:items-end"
+        // Sits above the fixed composer rather than on top of it.
+        className="pointer-events-none fixed inset-x-0 bottom-24 z-50 flex flex-col items-center gap-2 p-4 sm:items-end"
       >
         {toasts.map((toast) => (
           <ToastCard key={toast.id} toast={toast} onDismiss={() => dismiss(toast.id)} />
