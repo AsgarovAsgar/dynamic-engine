@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import { CORS_ORIGINS } from './constants.js';
 import { errorHandler, notFound } from './middleware/errorHandler.js';
+import { dashboardRouter } from './routes/dashboard.js';
 import { ok } from './types/api.js';
 
 /**
@@ -19,7 +20,7 @@ export function createApp() {
     res.json(ok({ status: 'healthy', uptime: process.uptime() }));
   });
 
-  // Routes are mounted here as each one is built.
+  app.use('/api', dashboardRouter);
 
   app.use(notFound);
   app.use(errorHandler);
