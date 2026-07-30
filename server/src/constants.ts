@@ -13,7 +13,7 @@ export const STREAM_WIDGET_DELAY_MS = 240;
 export const ACTION_LATENCY_MS = 450;
 
 /**
- * Probability an action fails, exercising the client's rollback path.
- * Bump to ~0.3 when demoing rollback.
+ * Payload flag that forces an action to fail, for demoing optimistic
+ * rollback deterministically.
  */
-export const ACTION_FAILURE_RATE = 0;
+export const FORCE_FAIL_FLAG = '__forceFail';

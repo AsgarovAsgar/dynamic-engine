@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import { STREAM_INITIAL_DELAY_MS, STREAM_WIDGET_DELAY_MS } from '../constants.js';
 import { buildDashboard } from '../data/scenarios.js';
-import { delay, openStream, sendFrame } from '../sse.js';
+import { delay } from '../delay.js';
+import { openStream, sendFrame } from '../sse.js';
 import { fail } from '../types/api.js';
 
 export const dashboardRouter = Router();
