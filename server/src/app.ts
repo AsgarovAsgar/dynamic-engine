@@ -3,6 +3,7 @@ import cors from 'cors';
 import { CORS_ORIGINS } from './constants.js';
 import { errorHandler, notFound } from './middleware/errorHandler.js';
 import { dashboardRouter } from './routes/dashboard.js';
+import { widgetActionRouter } from './routes/widgetAction.js';
 import { ok } from './types/api.js';
 
 /**
@@ -21,6 +22,7 @@ export function createApp() {
   });
 
   app.use('/api', dashboardRouter);
+  app.use('/api', widgetActionRouter);
 
   app.use(notFound);
   app.use(errorHandler);

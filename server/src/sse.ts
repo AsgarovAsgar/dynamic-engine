@@ -23,6 +23,3 @@ export function openStream(res: Response): void {
 export function sendFrame(res: Response, frame: StreamFrame): void {
   res.write(`event: ${frame.event}\ndata: ${JSON.stringify(frame)}\n\n`);
 }
-
-export const delay = (ms: number): Promise<void> =>
-  new Promise((resolve) => setTimeout(resolve, ms));
