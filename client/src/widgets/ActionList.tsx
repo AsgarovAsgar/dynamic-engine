@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Check } from 'lucide-react';
+import { useOptimisticAction } from '@/hooks/useOptimisticAction';
 import { cn } from '@/lib/cn';
 import type { WidgetComponentProps } from '@/registry/registry';
 import type { ActionListWidget } from '@/types/widgets';
@@ -7,15 +8,26 @@ import type { ActionListWidget } from '@/types/widgets';
 /**
  * Checklist of recommended actions.
  *
- * Toggle state is local for now; the next pass replaces it with an optimistic
- * dispatch to /api/widget-action that rolls back on failure. The interaction
- * shape is deliberately already correct, so wiring it up changes the state
- * source and nothing about the markup or keyboard behaviour.
+ * Toggling is optimistic: the checkbox flips instantly, the request goes out
+ * behind it, and a refusal restores the previous state with a toast offering
+ * a retry.
  */
 export function ActionList({ widget }: WidgetComponentProps<ActionListWidget>) {
   const [completed, setCompleted] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(widget.data.items.map((item) => [item.id, item.completed])),
   );
+
+  const setItem = (id: string, value: boolean) =>
+    setCompleted((current) => ({ ...current, [id]: value }));
+
+  const { dispatch } = useOptimisticAction<{ id: string; label: string; done: boolean }>({
+    widgetId: widget.id,
+    action: 'TOGGLE_ITEM',
+    apply: ({ id, done }) => setItem(id, done),
+    rollback: ({ id, done }) => setItem(id, done),
+    toPayload: ({ id, done }) => ({ itemId: id, completed: done }),
+    failureMessage: ({ label }) => `Could not update “${label}”. Change reverted.`,
+  });
 
   const done = Object.values(completed).filter(Boolean).length;
   const total = widget.data.items.length;
@@ -49,10 +61,10 @@ export function ActionList({ widget }: WidgetComponentProps<ActionListWidget>) {
                   type="checkbox"
                   checked={isDone}
                   onChange={(event) =>
-                    setCompleted((current) => ({
-                      ...current,
-                      [item.id]: event.target.checked,
-                    }))
+                    void dispatch(
+                      { id: item.id, label: item.label, done: event.target.checked },
+                      { id: item.id, label: item.label, done: isDone },
+                    )
                   }
                   className="peer sr-only"
                 />

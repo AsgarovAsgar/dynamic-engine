@@ -1,5 +1,6 @@
 import { useMemo, useState, type FormEvent } from 'react';
 import { Loader2 } from 'lucide-react';
+import { useOptimisticAction } from '@/hooks/useOptimisticAction';
 import { cn } from '@/lib/cn';
 import { validateAll, validateField, type FieldValue } from '@/lib/validateField';
 import type { WidgetComponentProps } from '@/registry/registry';
@@ -25,6 +26,24 @@ export function DynamicForm({ widget }: WidgetComponentProps<DynamicFormWidget>)
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [status, setStatus] = useState<'idle' | 'submitting'>('idle');
+
+  /** Last values the server accepted — the state a failed submit reverts to. */
+  const [submitted, setSubmitted] = useState<Record<string, FieldValue>>(initialValues);
+
+  const { dispatch } = useOptimisticAction<Record<string, FieldValue>>({
+    widgetId: widget.id,
+    action: 'SUBMIT_FORM',
+    apply: (next) => setSubmitted(next),
+    rollback: (previous) => {
+      // Restore both the accepted baseline and the visible fields, so the user
+      // sees exactly what the server still holds.
+      setSubmitted(previous);
+      setValues(previous);
+    },
+    toPayload: (next) => ({ values: next }),
+    failureMessage: () => `Could not apply ${widget.title}. Values reverted.`,
+    successMessage: () => `${widget.title} applied.`,
+  });
 
   const setValue = (field: FormField, value: FieldValue) => {
     setValues((current) => ({ ...current, [field.name]: value }));
@@ -62,10 +81,11 @@ export function DynamicForm({ widget }: WidgetComponentProps<DynamicFormWidget>)
 
     if (Object.keys(found).length > 0) return;
 
-    // Optimistic dispatch lands in the next pass; for now this exercises the
-    // submitting state without a network call.
+    // A form submit is optimistic in the sense that it confirms instantly and
+    // reverts on refusal — but unlike a toggle it keeps a pending state, since
+    // "applied" is a claim about the server, not about local UI.
     setStatus('submitting');
-    window.setTimeout(() => setStatus('idle'), 600);
+    void dispatch(values, submitted).finally(() => setStatus('idle'));
   };
 
   return (
