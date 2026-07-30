@@ -136,16 +136,31 @@
   }
 }
 
-/* Toast entrance. Opacity and translate only — both composite, so a toast
-   arriving mid-stream cannot cost the dashboard a layout pass. */
+/* Toast motion. Opacity, translate and scale only — all composite, so a toast
+   arriving mid-stream cannot cost the dashboard a layout pass.
+
+   Toasts sit at the top of the viewport, so they enter downward from above and
+   leave back the way they came. The slight scale makes them read as arriving
+   rather than sliding in from off-screen. */
 @keyframes toast-in {
   from {
     opacity: 0;
-    transform: translateY(0.5rem);
+    transform: translateY(-0.75rem) scale(0.96);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes toast-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-0.5rem) scale(0.96);
   }
 }
 
